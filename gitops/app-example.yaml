@@ -1,0 +1,22 @@
+# Example Argo CD Application: auto-deploys/auto-syncs whatever is in
+# the given repo path onto the cluster whenever Git changes.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: demo-app
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/<your-org>/<your-repo>.git
+    targetRevision: main
+    path: manifests/demo-app
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: default
+  syncPolicy:
+    automated:
+      prune: true      # remove resources deleted from Git
+      selfHeal: true    # revert manual cluster drift back to match Git
+    syncOptions:
+      - CreateNamespace=true
