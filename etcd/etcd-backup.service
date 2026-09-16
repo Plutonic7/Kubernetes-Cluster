@@ -1,0 +1,8 @@
+[Unit]
+Description=etcd snapshot backup
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/etcd-backup.sh
+Environment=BACKUP_DIR=/var/backups/etcd
+Environment=RETENTION_DAYS=14
