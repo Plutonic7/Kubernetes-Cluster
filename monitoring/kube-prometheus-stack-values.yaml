@@ -1,0 +1,53 @@
+# Helm values for prometheus-community/kube-prometheus-stack.
+# This chart bundles Prometheus, Grafana, Alertmanager, kube-state-metrics,
+# and prometheus-node-exporter (deployed as a DaemonSet on every node).
+# Install with: monitoring/install-monitoring.sh
+
+nodeExporter:
+  enabled: true
+
+prometheus-node-exporter:
+  # Runs as a DaemonSet so every node (control-plane + workers) is scraped.
+  tolerations:
+    - effect: NoSchedule
+      operator: Exists
+  resources:
+    requests:
+      cpu: 50m
+      memory: 50Mi
+    limits:
+      cpu: 100m
+      memory: 100Mi
+
+prometheus:
+  prometheusSpec:
+    retention: 15d
+    resources:
+      requests:
+        cpu: 200m
+        memory: 512Mi
+      limits:
+        memory: 1Gi
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: 20Gi
+
+grafana:
+  enabled: true
+  adminPassword: "changeme-immediately"   # override at install time, do not commit real value
+  defaultDashboardsTimezone: browser
+  persistence:
+    enabled: true
+    size: 5Gi
+
+alertmanager:
+  enabled: true
+  alertmanagerSpec:
+    resources:
+      requests:
+        cpu: 50m
+        memory: 64Mi
